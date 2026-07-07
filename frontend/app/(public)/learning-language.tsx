@@ -1,0 +1,147 @@
+import React, { useState } from 'react';
+import { View, Text, TextInput, ScrollView, TouchableOpacity, SafeAreaView, Image } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useOnboardingStore } from '../../store/onboardingStore';
+import { ArrowLeft, Search, CheckCircle, ArrowRight } from 'lucide-react-native';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+const LANGUAGES = [
+  { id: 'es', name: 'Spanish', isPopular: true, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAzjnbVkVflvt-wQroJ6QkiLScGhdDp0ym266JGOEl9ZMVjmhnjwP-Y8j7hXxvDwfjZeQt8-rCPWwyAB5elqIRbRWZ9t-QtwAFWdYd2zroCULZA8IqbI-Z9tMZHGCzqh1QKfh2JdbyRoS9ifEup7ysGsNzB00rrmJnIQQL4rdmCM3IXdPsQcpbBkvHnZz8-7LPGZlNTSfgsiB_uBWPMw6S2BBQ2UwQcTn8b2K6VUxGNBac-BFwzLpLVGtXt_cgz5zR4tMoRwO2MpX8' },
+  { id: 'fr', name: 'French', isPopular: true, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCw8O0eXPngkzHFMw9mgksbJ2Ox2SWsZj8kvZiLN0er8Cus88fX82F5pt3mjybngqX0x67FNPzpVEWOwovws_5nK1DIOBFjucCZVOULxUGypK-ewCVIRFeiZIK-T7S8eUtS-2SBWir1HyVm1C-wGf0-Jl_bfn7H4mmVCmSW2RKyriagzb_qd5t8a6qfWZhing7Wgsbs5wB7gubU2gPIlDlCnGzEq-WEcX6FJ9Qiu5iMcmGoEE2hxaIdc6JMk7je-0hEYxfr3salKfk' },
+  { id: 'ja', name: 'Japanese', isPopular: false, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDwy_TQKIOK-1C5plyx7H0s6yKmrWKz9qswDF5cNQFi4CkN2LDN8Um4lrlMls2pR-RgTE2KH-PVZznHpUpAJ_fFwORS-zzypcAIe9vsLue_gIgQR3qNEcvsesMthXptYrjVkDKHVq4klvcCkntu0JoUBE5UQ0eEIWKCTTJ5coQVPX2OxarKxx5SRQ2giJkAYN-wb_PvTENcb1yinVEyGFPUSa2saoJbt4QOIayhS0Pm3-UPxao3NiK4c6RhJw6Of2hkuyNIqqF6W9M' },
+  { id: 'ko', name: 'Korean', isPopular: false, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBgP1p67M7R5P7hHn9q6zK8sC9D7h_L9Kj9K7K7G4BvF2H7Wj1d2V0w1c5L8nZzQ7Z9xL6g3Q9L8bX_yX_0nQ1eG5cR8W_9_4X1H4yG9qW9Z_0_q_K_0_q_K_0_q' },
+  { id: 'it', name: 'Italian', isPopular: false, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB2yH8vH9uK4_tD0K6C5vD9wJ8H7vF3qQ9Z2X7K9_K_0_q_K_0_q' },
+  { id: 'de', name: 'German', isPopular: false, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAa2TKCibvQhvqSMn-Sr_wd2YeUnGR6nLUXrT_pLlDIgVksh0Czm6-NhXku1i18jNnEZHtkpl7fEBk25DdTobXjSZqV-rRvaPkRhBMRTV8RhVIthbWdqmSwK_36cSbGtxYNVJkEJfv9qZHfMySFxf7ndeFIlIOLMJf1cGH_Wx3umGBWckSKp4MTWwk7r3OY0hN9sTwTZttBfEW6G8JyjT4QOKOm8_VlGk6DOx5CCDmTHGjL7s_2Y2Lmln-Yzfu1L8hJ88EJH2P90tE' },
+];
+
+export default function LearningLanguageScreen() {
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const { learningLanguage, setLearningLanguage } = useOnboardingStore();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedLang, setSelectedLang] = useState<string | null>(learningLanguage);
+
+  const filteredLanguages = LANGUAGES.filter(l => l.name.toLowerCase().includes(searchQuery.toLowerCase()));
+
+  const handleContinue = () => {
+    if (selectedLang) {
+      setLearningLanguage(selectedLang);
+      router.push('/(public)/mentor-selection');
+    }
+  };
+
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(public)/native-language');
+    }
+  };
+
+  return (
+    <SafeAreaView className="flex-1 bg-background relative" edges={['bottom', 'left', 'right']}>
+      {/* Decorative Atmospheric Elements */}
+      <View className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full -mt-48 -mr-48 blur-[100px]" style={{ zIndex: -10 }} />
+      <View className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-secondary/5 rounded-full -mb-24 -ml-24 blur-[80px]" style={{ zIndex: -10 }} />
+
+      {/* TopAppBar */}
+      <View style={{ paddingTop: Math.max(insets.top, 20) }} className="w-full pb-4 flex-row items-center justify-between px-5 bg-surface/80 border-b border-outline-variant/20 z-50">
+        <View className="flex-row items-center gap-2">
+          <TouchableOpacity onPress={handleBack} activeOpacity={0.7} className="p-2 -ml-2 hit-slop-10">
+            <ArrowLeft color="#3f3bbd" size={24} />
+          </TouchableOpacity>
+          <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[20px] text-primary">Linguist AI</Text>
+        </View>
+        <View className="w-8 h-8 rounded-full border border-outline-variant/30 overflow-hidden bg-white">
+          <Image 
+            source={{ uri: "https://lh3.googleusercontent.com/aida-public/AB6AXuBdKFaoFlSJ4C2A-bvhnrOJSHJwYJX_qTYYeYFp9U-VNO5s6puMIuMNu1LUxJgPCVbT2zTncC9yO1XktRHxzAgpRYKK3d3GLw7btbzIn87MFfkCrHoYEuymTXzXXnJMAUe3jlxWQAwsGaJYxFf-r3QTA0FaJA5WkTyIsOCQ9ApiFRlLfVlJDq4uBY5wspnTG_lZIr5QN3iD2YtsMJQN9ujkSgqzvh7wAEAJaG5ytAC1L8-uqwg9WIzECMc47RUUosxxLxGdIy9uRvA" }}
+            className="w-full h-full"
+            resizeMode="cover"
+          />
+        </View>
+      </View>
+
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 32, paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
+        {/* Headline Section */}
+        <View className="mb-8">
+          <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[28px] leading-[34px] text-on-surface mb-2 tracking-tight">
+            Which language do you want to learn?
+          </Text>
+          <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-[17px] leading-[24px] text-on-surface-variant opacity-80">
+            You can add more later.
+          </Text>
+        </View>
+
+        {/* Search Bar */}
+        <View className="relative mb-8">
+          <View className="absolute inset-y-0 left-4 justify-center z-10">
+            <Search color="#464554" size={20} opacity={0.6} />
+          </View>
+          <TextInput
+            className="w-full h-12 pl-12 pr-4 bg-surface-container rounded-full text-[17px] text-on-surface"
+            placeholderTextColor="rgba(70, 69, 84, 0.5)"
+            placeholder="Search languages..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            style={{ fontFamily: 'Inter_400Regular' }}
+          />
+        </View>
+
+        {/* Language List */}
+        <View className="flex-col gap-4">
+          {filteredLanguages.map((item) => {
+            const isSelected = selectedLang === item.id;
+            return (
+              <TouchableOpacity
+                key={item.id}
+                onPress={() => setSelectedLang(item.id)}
+                activeOpacity={0.8}
+                className={`flex-row items-center justify-between p-5 rounded-xl border transition-colors ${
+                  isSelected ? 'bg-primary-fixed border-primary shadow-sm' : 'bg-surface-container-low border-transparent'
+                }`}
+              >
+                <View className="flex-row items-center gap-5">
+                  <View className="w-12 h-12 rounded-full bg-surface-container-highest overflow-hidden items-center justify-center border border-outline-variant/10">
+                    <Image source={{ uri: item.image }} className="w-full h-full" />
+                  </View>
+                  <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[20px] text-on-surface">
+                    {item.name}
+                  </Text>
+                </View>
+
+                {item.isPopular && !isSelected && (
+                  <View className="bg-primary/10 px-3 py-1 rounded-full">
+                    <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[10px] text-primary tracking-wider uppercase">Popular</Text>
+                  </View>
+                )}
+
+                {isSelected && (
+                  <Animated.View entering={FadeIn} exiting={FadeOut}>
+                    <CheckCircle color="#ffffff" fill="#3f3bbd" size={24} />
+                  </Animated.View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </ScrollView>
+
+      {/* Bottom Action Area */}
+      <View className="absolute bottom-0 w-full px-5 pb-8 pt-4 bg-surface/90">
+        <TouchableOpacity
+          disabled={!selectedLang}
+          onPress={handleContinue}
+          activeOpacity={0.8}
+          className={`w-full h-[56px] rounded-full flex-row items-center justify-center transition-colors ${
+            selectedLang ? 'bg-primary shadow-lg shadow-primary/20' : 'bg-outline-variant/30'
+          }`}
+        >
+          <Text style={{ fontFamily: 'Inter_600SemiBold' }} className={`text-[20px] ${selectedLang ? 'text-on-primary' : 'text-on-surface/40'}`}>
+            Continue
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+}
