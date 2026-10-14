@@ -56,6 +56,23 @@ app.get('/health', (req: Request, res: Response) => {
 app.use(`/api/${envConfig.app.version}`, apiRoutes);
 app.use('/api', apiRoutes);
 
+// Diagnostic Crash Logging Endpoint
+const latestCrashLogs: any[] = [];
+app.post('/api/crash-log', (req: Request, res: Response) => {
+  const crashData = {
+    receivedAt: new Date().toISOString(),
+    ...req.body,
+  };
+  latestCrashLogs.unshift(crashData);
+  if (latestCrashLogs.length > 50) latestCrashLogs.pop();
+  logger.error(`[MOBILE_CRASH_REPORT] ${JSON.stringify(crashData)}`);
+  res.status(200).json({ success: true, message: 'Crash logged' });
+});
+
+app.get('/api/crash-log', (req: Request, res: Response) => {
+  res.status(200).json({ success: true, count: latestCrashLogs.length, logs: latestCrashLogs });
+});
+
 // 404 Handler
 app.use((req: Request, res: Response, next: NextFunction) => {
   next(new ApiError(404, `Route ${req.method} ${req.originalUrl} not found`));
