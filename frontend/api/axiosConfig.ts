@@ -7,15 +7,7 @@ const getBaseUrl = (): string => {
   if (process.env.EXPO_PUBLIC_API_URL) {
     return process.env.EXPO_PUBLIC_API_URL;
   }
-  if (Platform.OS === 'android' || Platform.OS === 'ios') {
-    const hostUri = Constants.expoConfig?.hostUri;
-    if (hostUri) {
-      const host = hostUri.split(':')[0];
-      return `http://${host}:5000/api`;
-    }
-    return 'http://192.168.1.26:5000/api';
-  }
-  return 'http://localhost:5000/api';
+  return 'https://language-mentor-backend.vercel.app/api';
 };
 
 export const api = axios.create({
