@@ -7,11 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#F2F2F7"
-    },
     "android": {
       "package": "com.ailanguagementor.app",
       "versionCode": 1,
@@ -29,11 +24,14 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-localization",
-      "expo-secure-store",
-      "expo-status-bar",
-      "expo-image",
-      "expo-splash-screen",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#F2F2F7"
+        }
+      ],
       [
         "expo-av",
         {
