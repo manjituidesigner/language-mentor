@@ -10,6 +10,7 @@ build/
 .expo/
 web-build/
 *.jsbundle
+*.apk
 
 # Android build artifacts
 .gradle/

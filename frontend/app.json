@@ -46,9 +46,11 @@
       "typedRoutes": true
     },
     "extra": {
+      "router": {},
       "eas": {
-        "projectId": "your-eas-project-id"
+        "projectId": "5d601fd9-161b-4488-bfd8-07c030ac8e17"
       }
-    }
+    },
+    "owner": "manjitnic"
   }
 }
