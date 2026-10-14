@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -13,7 +13,7 @@ import {
 import { useAuthStore } from '../store/authStore';
 import '../styles/global.css';
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -28,11 +28,21 @@ export default function RootLayout() {
   const segments = useSegments();
   const router = useRouter();
 
+  const [forceReady, setForceReady] = useState(false);
+
   useEffect(() => {
-    if (fontsLoaded || fontError) {
-      SplashScreen.hideAsync();
+    const timer = setTimeout(() => {
+      setForceReady(true);
+      SplashScreen.hideAsync().catch(() => {});
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (fontsLoaded || fontError || forceReady) {
+      SplashScreen.hideAsync().catch(() => {});
     }
-  }, [fontsLoaded, fontError]);
+  }, [fontsLoaded, fontError, forceReady]);
 
   useEffect(() => {
     const inPublicGroup = segments[0] === '(public)';
@@ -47,7 +57,7 @@ export default function RootLayout() {
     }
   }, [isAuthenticated, hasCompletedOnboarding, segments]);
 
-  if (!fontsLoaded && !fontError) {
+  if (!fontsLoaded && !fontError && !forceReady) {
     return null;
   }
 
