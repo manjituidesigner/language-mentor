@@ -13,7 +13,9 @@ import {
 import { useAuthStore } from '../store/authStore';
 import '../styles/global.css';
 
-SplashScreen.preventAutoHideAsync().catch(() => {});
+try {
+  SplashScreen.preventAutoHideAsync().catch(() => {});
+} catch (_) {}
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
