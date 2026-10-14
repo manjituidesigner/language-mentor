@@ -15,4 +15,8 @@ export * from './ui/EmptyState';
 export * from './ui/BottomSheet';
 export * from './ui/Modal';
 export * from './ui/Toast';
-export * from './ui/Divider';
+export * from './ui/BackButton';
+export * from './ui/SearchInput';
+export * from './ui/PrimaryButton';
+export * from './ProfileModal';
+

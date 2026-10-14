@@ -31,11 +31,7 @@ module.exports = {
         semibold: ['Inter_600SemiBold', 'sans-serif'],
         bold: ['Inter_700Bold', 'sans-serif'],
       },
-      spacing: {
-        '2': '2px', '4': '4px', '6': '6px', '8': '8px', '10': '10px',
-        '12': '12px', '16': '16px', '20': '20px', '24': '24px', '32': '32px',
-        '40': '40px', '48': '48px', '56': '56px', '64': '64px',
-      },
+
       borderRadius: {
         xs: '4px', sm: '8px', md: '12px', lg: '16px', xl: '20px', '2xl': '24px', '3xl': '32px', full: '9999px',
       },

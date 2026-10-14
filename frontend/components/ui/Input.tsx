@@ -12,7 +12,7 @@ export function Input({ label, error, className = '', ...props }: InputProps) {
       {label && <Text className="text-sm font-medium text-textSecondary dark:text-gray-400 mb-1">{label}</Text>}
       <TextInput
         placeholderTextColor="#94A3B8"
-        className={g-surface dark:bg-gray-800 border  rounded-xl px-4 py-3 text-textPrimary dark:text-white }
+        className={`bg-surface dark:bg-gray-800 border border-border dark:border-gray-700 rounded-xl px-4 py-3 text-textPrimary dark:text-white ${className}`}
         {...props}
       />
       {error && <Text className="text-xs text-danger mt-1">{error}</Text>}

@@ -1,17 +1,45 @@
+# Dependencies
 node_modules/
-.expo/
+**/node_modules/
+
+# Builds & Outputs
 dist/
-npm-debug.*
+**/dist/
+build/
+**/build/
+.expo/
+web-build/
+*.jsbundle
+
+# Android build artifacts
+.gradle/
+**/android/.gradle/
+**/android/build/
+**/android/app/build/
+**/android/.cxx/
+**/android/**/build/
+**/android/**/.cxx/
+local.properties
+**/local.properties
+
+# Environment Variables & Secrets (CRITICAL)
+.env
+.env.*
+!.env.example
 *.jks
 *.p8
 *.p12
 *.key
 *.mobileprovision
-*.orig.*
+
+# Logs
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+*.log
+
+# Editor directories
 .idea/
 .vscode/
 *.swp
-.env
-.env.*
-!.env.example
 .DS_Store

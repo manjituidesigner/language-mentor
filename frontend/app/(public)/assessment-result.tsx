@@ -1,190 +1,211 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, ArrowRight, Timer } from 'lucide-react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Timer } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../../store/authStore';
+import { BackButton } from '../../components/ui/BackButton';
+import { PrimaryButton } from '../../components/ui/PrimaryButton';
 
 export default function AssessmentResultScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { login, completeOnboarding } = useAuthStore();
 
-  const handleStartLearning = () => {
-    login();
-    completeOnboarding();
-    router.replace('/(private)/dashboard');
-  };
-
-  const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/(public)/assessment-chat');
-    }
+  const handleContinueToGoals = () => {
+    router.push('/(public)/goal-setup');
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#fcf8ff]" edges={['left', 'right', 'bottom']}>
+    <View className="flex-1 bg-[#F2F2F7] relative">
       {/* Top AppBar */}
-      <View style={{ paddingTop: Math.max(insets.top, 16) }} className="w-full pb-3 flex-row items-center justify-between px-5 bg-[#fcf8ff] z-50">
-        <TouchableOpacity onPress={handleBack} activeOpacity={0.7} className="p-2 -ml-2">
-          <ArrowLeft color="#3f3bbd" size={24} />
-        </TouchableOpacity>
-        <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[18px] text-primary tracking-tight">Mentor AI</Text>
-        <View className="w-8 h-8 rounded-full border border-outline-variant/30 overflow-hidden">
-          <Image 
-            source={{ uri: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop" }} 
-            className="w-full h-full"
-            resizeMode="cover"
-          />
-        </View>
+      <View
+        style={{ paddingTop: Math.max(insets.top, 16) }}
+        className="w-full pb-3 px-5 bg-[#F2F2F7]/95 border-b border-zinc-200/80 z-50 flex-row items-center justify-between"
+      >
+        <BackButton fallbackRoute="/(public)/assessment-chat" />
+        <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[17px] text-zinc-900 tracking-tight">
+          Assessment Result
+        </Text>
+        <View style={{ width: 44, height: 44 }} />
       </View>
 
-      <ScrollView className="flex-1 w-full" contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 140 }} showsVerticalScrollIndicator={false}>
-        {/* Results Hero Section */}
-        <View className="items-center mb-8">
-          <View className="relative items-center justify-center mb-5">
-            <View className="w-36 h-36 rounded-full bg-white border border-[#c2c1ff] items-center justify-center shadow-sm shadow-black/5">
-              <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[10px] text-primary uppercase tracking-widest mb-1">Your Level</Text>
-              <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[44px] text-primary leading-none mb-1">A2</Text>
-              <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-[14px] text-on-surface-variant">Elementary</Text>
-            </View>
+
+      <ScrollView
+        className="flex-1 w-full"
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 20,
+          paddingBottom: Math.max(insets.bottom, 20) + 90,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Results Hero Card */}
+        <View className="w-full bg-white rounded-2xl p-6 items-center border border-zinc-200/70 shadow-sm shadow-black/[0.02] mb-5">
+          <View className="w-28 h-28 rounded-full bg-indigo-50 border-2 border-indigo-200/80 items-center justify-center mb-4">
+            <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[11px] text-indigo-600 uppercase tracking-widest mb-0.5">
+              CEFR Level
+            </Text>
+            <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[40px] text-indigo-600 leading-none mb-0.5">
+              A2
+            </Text>
+            <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-[13px] text-zinc-500">
+              Elementary
+            </Text>
           </View>
-          <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-[14px] leading-[22px] text-on-surface-variant text-center max-w-[300px]">
-            Great job! You can communicate in simple and routine tasks and understand common expressions. We're ready to take you to B1.
+          <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[20px] text-zinc-900 text-center mb-1.5">
+            Great Foundation!
+          </Text>
+          <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-[14px] leading-[22px] text-zinc-500 text-center px-2">
+            You can communicate routine tasks and understand common daily expressions. We've crafted a pathway to get you to B1!
           </Text>
         </View>
 
-        {/* Mentor Feedback (Overlapping Avatar) */}
-        <View className="mt-10 mb-6 pt-12 px-6 pb-6 bg-white rounded-[24px] items-center shadow-sm shadow-black/5 border border-white relative">
-          <View className="absolute -top-10 w-20 h-20 rounded-full border-[5px] border-[#fcf8ff] bg-white overflow-hidden shadow-sm">
-            <Image 
-              source={{ uri: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop" }} 
-              className="w-full h-full"
-              resizeMode="cover"
-            />
+        {/* Mentor Feedback */}
+        <View className="bg-white rounded-2xl p-5 border border-zinc-200/70 shadow-sm shadow-black/[0.02] mb-5">
+          <View className="flex-row items-center gap-3 mb-3">
+            <View className="w-12 h-12 rounded-full border border-zinc-200 overflow-hidden bg-white shadow-sm">
+              <Image
+                source={{ uri: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop' }}
+                className="w-full h-full"
+                resizeMode="cover"
+              />
+            </View>
+            <View>
+              <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[15px] text-zinc-900">
+                Sophie's Observation
+              </Text>
+              <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-[12px] text-zinc-400">
+                AI Senior Tutor
+              </Text>
+            </View>
           </View>
-          <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[18px] text-on-background mb-3">Sophie says...</Text>
-          <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-[14px] leading-[22px] text-on-surface-variant text-center">
-            "Your grammar is surprisingly strong! I've noticed you're a bit hesitant when speaking, so our next few lessons will focus on conversational flow to boost your confidence."
+          <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-[14px] leading-[22px] text-zinc-600">
+            "Your grammar and vocabulary recall are strong! You hesitated slightly when replying, so we'll prioritize high-frequency conversation practice to boost your natural speaking cadence."
           </Text>
         </View>
 
         {/* Score Breakdown Card */}
-        <View className="bg-white rounded-[24px] p-6 border border-white shadow-sm shadow-black/5 mb-10">
-          <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[16px] text-on-background mb-5">Assessment Breakdown</Text>
-          
+        <View className="bg-white rounded-2xl p-5 border border-zinc-200/70 shadow-sm shadow-black/[0.02] mb-6">
+          <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[15px] text-zinc-900 mb-4">
+            Skill Breakdown
+          </Text>
+
           <View className="flex-col gap-4">
             {/* Speaking */}
             <View>
               <View className="flex-row justify-between mb-1.5">
-                <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-[12px] text-on-background">Speaking</Text>
-                <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-[12px] text-primary">64%</Text>
+                <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-[13px] text-zinc-700">Speaking</Text>
+                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[13px] text-indigo-600">64%</Text>
               </View>
-              <View className="h-[6px] w-full bg-[#eae6f2] rounded-full overflow-hidden">
-                <View className="h-full bg-primary rounded-full" style={{ width: '64%' }} />
+              <View className="h-2 w-full bg-zinc-100 rounded-full overflow-hidden">
+                <View className="h-full bg-indigo-600 rounded-full" style={{ width: '64%' }} />
               </View>
             </View>
 
             {/* Listening */}
             <View>
               <View className="flex-row justify-between mb-1.5">
-                <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-[12px] text-on-background">Listening</Text>
-                <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-[12px] text-primary">78%</Text>
+                <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-[13px] text-zinc-700">Listening</Text>
+                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[13px] text-emerald-600">78%</Text>
               </View>
-              <View className="h-[6px] w-full bg-[#eae6f2] rounded-full overflow-hidden">
-                <View className="h-full bg-primary rounded-full" style={{ width: '78%' }} />
+              <View className="h-2 w-full bg-zinc-100 rounded-full overflow-hidden">
+                <View className="h-full bg-emerald-600 rounded-full" style={{ width: '78%' }} />
               </View>
             </View>
 
             {/* Grammar */}
             <View>
               <View className="flex-row justify-between mb-1.5">
-                <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-[12px] text-on-background">Grammar</Text>
-                <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-[12px] text-primary">92%</Text>
+                <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-[13px] text-zinc-700">Grammar</Text>
+                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[13px] text-amber-600">92%</Text>
               </View>
-              <View className="h-[6px] w-full bg-[#eae6f2] rounded-full overflow-hidden">
-                <View className="h-full bg-primary rounded-full" style={{ width: '92%' }} />
+              <View className="h-2 w-full bg-zinc-100 rounded-full overflow-hidden">
+                <View className="h-full bg-amber-600 rounded-full" style={{ width: '92%' }} />
               </View>
             </View>
 
             {/* Vocabulary */}
             <View>
               <View className="flex-row justify-between mb-1.5">
-                <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-[12px] text-on-background">Vocabulary</Text>
-                <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-[12px] text-primary">71%</Text>
+                <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-[13px] text-zinc-700">Vocabulary</Text>
+                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[13px] text-purple-600">71%</Text>
               </View>
-              <View className="h-[6px] w-full bg-[#eae6f2] rounded-full overflow-hidden">
-                <View className="h-full bg-primary rounded-full" style={{ width: '71%' }} />
+              <View className="h-2 w-full bg-zinc-100 rounded-full overflow-hidden">
+                <View className="h-full bg-purple-600 rounded-full" style={{ width: '71%' }} />
               </View>
             </View>
           </View>
         </View>
 
         {/* Personalized Plan Section */}
-        <View className="mb-6">
-          <View className="flex-row items-center justify-between mb-4">
-            <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[18px] text-on-background">Personalized Plan</Text>
-            <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[10px] text-primary uppercase tracking-wider">3 LESSONS READY</Text>
+        <View className="mb-4">
+          <View className="flex-row items-center justify-between mb-3 px-1">
+            <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[16px] text-zinc-900">
+              Target Curriculum
+            </Text>
+            <View className="bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
+              <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[10px] text-indigo-700 uppercase">
+                3 Lessons Ready
+              </Text>
+            </View>
           </View>
 
-          <View className="flex-col gap-4">
+          <View className="flex-col gap-3">
             {/* Lesson Card 1 */}
-            <View className="bg-[#f5f2fd] rounded-2xl overflow-hidden shadow-sm shadow-black/5">
-              <View className="h-28 bg-surface-variant relative">
+            <View className="bg-white rounded-2xl overflow-hidden border border-zinc-200/70 shadow-sm shadow-black/[0.02]">
+              <View className="h-28 bg-zinc-100 relative">
                 <Image source={{ uri: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&h=300&fit=crop' }} className="w-full h-full" resizeMode="cover" />
-                <View className="absolute top-2 left-2 bg-white/95 px-2 py-1 rounded-full flex-row items-center gap-1">
-                  <Timer color="#777585" size={12} />
-                  <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[10px] text-[#777585]">12 MIN</Text>
+                <View className="absolute top-2.5 left-2.5 bg-white/95 px-2 py-0.5 rounded-lg flex-row items-center gap-1 shadow-sm">
+                  <Timer color="#4f46e5" size={12} />
+                  <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[11px] text-zinc-800">12 MIN</Text>
                 </View>
               </View>
               <View className="p-4">
-                <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[15px] text-on-background mb-1">Coffee House Talk</Text>
-                <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-[13px] leading-[18px] text-on-surface-variant mb-4">Master casual ordering and small talk in high-frequency social settings.</Text>
+                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[15px] text-zinc-900 mb-1">Coffee House Talk</Text>
+                <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-[13px] leading-[18px] text-zinc-500 mb-3">Master casual ordering and small talk in high-frequency social settings.</Text>
                 <View className="flex-row items-center">
-                  <View className="bg-[#e2dfff] px-2.5 py-1 rounded-full">
-                    <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[9px] text-primary uppercase tracking-wider">SPEAKING</Text>
+                  <View className="bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-100/60">
+                    <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[10px] text-indigo-700 uppercase tracking-wider">SPEAKING</Text>
                   </View>
                 </View>
               </View>
             </View>
 
             {/* Lesson Card 2 */}
-            <View className="bg-[#f5f2fd] rounded-2xl overflow-hidden shadow-sm shadow-black/5">
-              <View className="h-28 bg-surface-variant relative">
+            <View className="bg-white rounded-2xl overflow-hidden border border-zinc-200/70 shadow-sm shadow-black/[0.02]">
+              <View className="h-28 bg-zinc-100 relative">
                 <Image source={{ uri: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=300&fit=crop' }} className="w-full h-full" resizeMode="cover" />
-                <View className="absolute top-2 left-2 bg-white/95 px-2 py-1 rounded-full flex-row items-center gap-1">
-                  <Timer color="#777585" size={12} />
-                  <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[10px] text-[#777585]">8 MIN</Text>
+                <View className="absolute top-2.5 left-2.5 bg-white/95 px-2 py-0.5 rounded-lg flex-row items-center gap-1 shadow-sm">
+                  <Timer color="#d97706" size={12} />
+                  <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[11px] text-zinc-800">8 MIN</Text>
                 </View>
               </View>
               <View className="p-4">
-                <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[15px] text-on-background mb-1">Past Tense Mastery</Text>
-                <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-[13px] leading-[18px] text-on-surface-variant mb-4">Quick refresher on irregular verbs and narrative storytelling structures.</Text>
+                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[15px] text-zinc-900 mb-1">Past Tense Mastery</Text>
+                <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-[13px] leading-[18px] text-zinc-500 mb-3">Quick refresher on irregular verbs and narrative storytelling structures.</Text>
                 <View className="flex-row items-center">
-                  <View className="bg-[#ffdcc6] px-2.5 py-1 rounded-full">
-                    <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[9px] text-[#7e3e00] uppercase tracking-wider">GRAMMAR</Text>
+                  <View className="bg-amber-50 px-2.5 py-1 rounded-md border border-amber-100/60">
+                    <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[10px] text-amber-700 uppercase tracking-wider">GRAMMAR</Text>
                   </View>
                 </View>
               </View>
             </View>
 
             {/* Lesson Card 3 */}
-            <View className="bg-[#f5f2fd] rounded-2xl overflow-hidden shadow-sm shadow-black/5">
-              <View className="h-28 bg-surface-variant relative">
+            <View className="bg-white rounded-2xl overflow-hidden border border-zinc-200/70 shadow-sm shadow-black/[0.02]">
+              <View className="h-28 bg-zinc-100 relative">
                 <Image source={{ uri: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=300&fit=crop' }} className="w-full h-full" resizeMode="cover" />
-                <View className="absolute top-2 left-2 bg-white/95 px-2 py-1 rounded-full flex-row items-center gap-1">
-                  <Timer color="#777585" size={12} />
-                  <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[10px] text-[#777585]">15 MIN</Text>
+                <View className="absolute top-2.5 left-2.5 bg-white/95 px-2 py-0.5 rounded-lg flex-row items-center gap-1 shadow-sm">
+                  <Timer color="#7c3aed" size={12} />
+                  <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[11px] text-zinc-800">15 MIN</Text>
                 </View>
               </View>
               <View className="p-4">
-                <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[15px] text-on-background mb-1">The Modern Nomad</Text>
-                <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-[13px] leading-[18px] text-on-surface-variant mb-4">Expand your travel vocabulary with terms for digital workspaces and transit.</Text>
+                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[15px] text-zinc-900 mb-1">The Modern Nomad</Text>
+                <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-[13px] leading-[18px] text-zinc-500 mb-3">Expand your travel vocabulary with terms for digital workspaces and transit.</Text>
                 <View className="flex-row items-center">
-                  <View className="bg-[#d8e2ff] px-2.5 py-1 rounded-full">
-                    <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[9px] text-[#0058bc] uppercase tracking-wider">VOCABULARY</Text>
+                  <View className="bg-purple-50 px-2.5 py-1 rounded-md border border-purple-100/60">
+                    <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[10px] text-purple-700 uppercase tracking-wider">VOCABULARY</Text>
                   </View>
                 </View>
               </View>
@@ -194,16 +215,16 @@ export default function AssessmentResultScreen() {
       </ScrollView>
 
       {/* Bottom Action CTA */}
-      <View className="absolute bottom-0 w-full px-5 py-6 bg-[#fcf8ff]/90 border-t border-outline-variant/10">
-        <TouchableOpacity 
-          onPress={handleStartLearning}
-          activeOpacity={0.8}
-          className="w-full h-14 bg-primary rounded-full flex-row items-center justify-center shadow-lg shadow-primary/20"
-        >
-          <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[18px] text-on-primary mr-2">Start Learning</Text>
-          <ArrowRight color="#ffffff" size={20} />
-        </TouchableOpacity>
+      <View
+        style={{ paddingBottom: Math.max(insets.bottom, 16) }}
+        className="absolute bottom-0 w-full px-5 pt-3 bg-white/95 border-t border-zinc-200/80 shadow-xl shadow-black/5"
+      >
+        <PrimaryButton
+          title="Save Level & Set Goals"
+          onPress={handleContinueToGoals}
+        />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
+

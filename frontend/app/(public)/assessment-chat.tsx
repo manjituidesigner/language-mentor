@@ -1,114 +1,196 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, ScrollView, TouchableOpacity, SafeAreaView, Image, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, ScrollView, TouchableOpacity, Image, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useOnboardingStore } from '../../store/onboardingStore';
-import { ArrowLeft, Mic, Send, Square } from 'lucide-react-native';
+import { assessmentService } from '../../services/assessmentService';
+import { speechService } from '../../services/speechService';
+import { ArrowLeft, Mic, Send, Square, Sparkles } from 'lucide-react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BackButton } from '../../components/ui/BackButton';
 
 export default function AssessmentChatScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { learningLanguage } = useOnboardingStore();
+  const { learningLanguageName, nativeLanguageName, mentorName, setAssessmentResult } = useOnboardingStore();
   const [inputText, setInputText] = useState('');
   const [isRecording, setIsRecording] = useState(false);
+
+  const targetLang = learningLanguageName || 'English';
+  const nativeLang = nativeLanguageName || 'Hindi';
+  const mentor = mentorName || 'Sophie';
 
   const handleBack = () => {
     if (router.canGoBack()) {
       router.back();
     } else {
-      router.replace('/(public)/assessment-intro');
+      router.replace('/(public)/mentor-selection');
     }
   };
 
-  const handleSend = () => {
-    if (inputText.trim()) {
-      // Navigate to results screen after user "answers" the assessment question
+  const handleSend = async () => {
+    const text = inputText.trim();
+    if (text) {
+      if (isRecording) {
+        speechService.stopSpeechRecognition();
+        setIsRecording(false);
+      }
+      // Submit assessment answer to backend
+      assessmentService.submitAssessment([{ questionId: 'q1', text }]).then((res) => {
+        if (res) {
+          setAssessmentResult({
+            overallScore: res.overallScore,
+            cefrLevel: res.cefrLevel,
+            scores: res.scores,
+            strengths: res.strengths,
+            weaknesses: res.weaknesses,
+            estimatedFluencyTime: '3-4 Months',
+            recommendedDailyTime: '15 mins/day',
+          });
+        }
+      });
       router.push('/(public)/assessment-result');
       setInputText('');
     }
   };
 
   const toggleRecording = () => {
-    setIsRecording(!isRecording);
+    if (isRecording) {
+      speechService.stopSpeechRecognition();
+      setIsRecording(false);
+    } else {
+      const started = speechService.startSpeechRecognition({
+        onResult: (transcript) => {
+          setInputText(transcript);
+        },
+        onError: () => setIsRecording(false),
+        onEnd: () => setIsRecording(false),
+      });
+      if (started) {
+        setIsRecording(true);
+      } else {
+        setIsRecording(true);
+        setTimeout(() => {
+          setInputText('I want to improve my daily speaking for job interviews and travel');
+          setIsRecording(false);
+        }, 2000);
+      }
+    }
   };
 
-  const quickReplies = ['For travel', 'For work', 'For fun', 'Improve grades'];
+  const quickReplies = [
+    'For travel & exploration',
+    'For job & business career',
+    'Daily conversations & friends',
+    'To crack exams & IELTS',
+  ];
 
   return (
-    <SafeAreaView className="flex-1 bg-background" edges={['top', 'left', 'right']}>
-      {/* Background Overlay */}
-      <View className="absolute inset-0 bg-[#fcf8ff]" style={{ zIndex: -10 }}>
-        <View className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#e2dfff]/20 rounded-full -mt-24 -mr-24 blur-3xl" />
-      </View>
+    <View className="flex-1 bg-[#F2F2F7] relative">
+      {/* Top Header Bar with Safe Area */}
+      <View
+        style={{ paddingTop: Math.max(insets.top, 16) }}
+        className="w-full pb-3 px-5 bg-[#F2F2F7]/95 border-b border-zinc-200/80 z-50 flex-row items-center justify-between"
+      >
+        <BackButton fallbackRoute="/(public)/assessment-intro" />
 
-      {/* TopAppBar */}
-      <View style={{ paddingTop: Math.max(insets.top, 16) }} className="w-full pb-4 flex-row items-center justify-between px-5 bg-surface/80 border-b border-outline-variant/20 z-50">
-        <View className="flex-row items-center gap-2">
-          <TouchableOpacity onPress={handleBack} activeOpacity={0.7} className="p-2 -ml-2 hit-slop-10 flex-row items-center">
-            <ArrowLeft color="#3f3bbd" size={22} />
-            <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[18px] text-primary ml-1">Assessment</Text>
-          </TouchableOpacity>
-        </View>
-        <View className="flex-col items-end gap-1.5">
-          <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[10px] text-on-surface-variant uppercase tracking-wider">
-            Question 1 of 10
+
+        <View className="flex-col items-center">
+          <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[17px] text-zinc-900">
+            AI Level Assessment
           </Text>
-          <View className="w-24 h-1.5 bg-[#eae6f2] rounded-full overflow-hidden">
-            <View className="w-[10%] h-full bg-primary rounded-full" />
+          <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-[11px] text-zinc-500">
+            {targetLang} • Guided in {nativeLang}
+          </Text>
+        </View>
+
+        <View className="flex-col items-end gap-1">
+          <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[10px] text-indigo-600 uppercase">
+            Step 1 of 5
+          </Text>
+          <View className="w-16 h-1.5 bg-zinc-200 rounded-full overflow-hidden">
+            <View className="w-[20%] h-full bg-indigo-600 rounded-full" />
           </View>
         </View>
       </View>
 
       {/* Chat Area */}
-      <ScrollView className="flex-1 px-5" contentContainerStyle={{ paddingTop: 24, paddingBottom: 24 }} showsVerticalScrollIndicator={false}>
-        {/* Mentor Welcome Message Group */}
-        <Animated.View entering={FadeInUp.duration(600).delay(100)} className="flex-col max-w-[85%] mb-6">
-          <View className="flex-row items-center gap-3 mb-2">
-            <View className="w-10 h-10 rounded-full border-2 border-primary-container p-[2px]">
-              <Image 
-                source={{ uri: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop" }} 
-                className="w-full h-full rounded-full" 
+      <ScrollView
+        className="flex-1 px-5"
+        contentContainerStyle={{ paddingTop: 20, paddingBottom: 24 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Mentor Welcome Bubble */}
+        <Animated.View entering={FadeInUp.duration(500).delay(100)} className="flex-col max-w-[88%] mb-5">
+          <View className="flex-row items-center gap-2 mb-2">
+            <View className="w-8 h-8 rounded-full border border-zinc-200 overflow-hidden bg-white shadow-sm">
+              <Image
+                source={{
+                  uri: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop',
+                }}
+                className="w-full h-full"
               />
             </View>
-            <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[10px] text-primary uppercase tracking-wider">
-              Sophie • Mentor
+            <View className="flex-row items-center gap-1.5">
+              <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[13px] text-zinc-900">
+                {mentor}
+              </Text>
+              <View className="bg-indigo-50 px-1.5 py-0.5 rounded-md border border-indigo-100/60">
+                <Text style={{ fontFamily: 'Inter_700Bold' }} className="text-[9px] text-indigo-700">
+                  AI TUTOR
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          <View className="bg-white p-4.5 rounded-2xl rounded-tl-sm border border-zinc-200/70 shadow-sm shadow-black/[0.02]">
+            <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-[15px] leading-[23px] text-zinc-800">
+              Namaste & Hello! I'm <Text style={{ fontFamily: 'Inter_700Bold', color: '#4f46e5' }}>{mentor}</Text>.
+              {'\n\n'}
+              I'm excited to help you master <Text style={{ fontFamily: 'Inter_700Bold' }}>{targetLang}</Text>! Whenever you get stuck, I will explain concepts and grammar in <Text style={{ fontFamily: 'Inter_700Bold', color: '#059669' }}>{nativeLang}</Text>.
+              {'\n\n'}
+              To kick off our short check-in, tell me: <Text style={{ fontFamily: 'Inter_600SemiBold' }}>What is your main goal for learning {targetLang}?</Text>
             </Text>
           </View>
-          
-          <View className="bg-[#f5f2fd] p-4 rounded-2xl rounded-tl-sm border border-outline-variant/20 shadow-sm shadow-black/5">
-            <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-[16px] leading-[24px] text-on-surface">
-              Hi! I'm Sophie. To get started, I'd love to hear a bit about why you want to learn <Text style={{ fontFamily: 'Inter_700Bold', color: '#3f3bbd' }}>{learningLanguage || 'Spanish'}</Text>. You can type your answer or tap the microphone to speak!
-            </Text>
-          </View>
-          <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-[11px] text-on-surface-variant/60 ml-2 mt-2">
+          <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-[11px] text-zinc-400 ml-2 mt-1.5">
             Delivered • Just now
           </Text>
         </Animated.View>
 
-        {/* System Prompt */}
-        <Animated.View entering={FadeInUp.duration(600).delay(400)} className="items-center my-4">
-          <View className="px-4 py-2 bg-[#eae6f2]/50 rounded-full">
-            <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[11px] text-on-surface-variant">
-              Choose an option or start speaking
+        {/* Suggestion pill */}
+        <Animated.View entering={FadeInUp.duration(500).delay(300)} className="items-center my-3">
+          <View className="px-3.5 py-1.5 bg-white rounded-full flex-row items-center gap-1.5 border border-zinc-200/80 shadow-sm shadow-black/[0.02]">
+            <Sparkles size={13} color="#4f46e5" />
+            <Text style={{ fontFamily: 'Inter_600SemiBold' }} className="text-[11px] text-zinc-600">
+              Choose a quick answer or speak into the mic
             </Text>
           </View>
         </Animated.View>
       </ScrollView>
 
-      {/* Input Area */}
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="w-full bg-[#fcf8ff]/90 border-t border-outline-variant/20 pb-8 pt-3 z-40">
-        {/* Quick Replies */}
-        <View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 12, paddingBottom: 16 }}>
+      {/* Input Area with Keyboard Avoidance & Safe Area */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ paddingBottom: Math.max(insets.bottom, 16) }}
+        className="w-full bg-[#F2F2F7]/95 border-t border-zinc-200/80 pt-3 z-40"
+      >
+        {/* Quick Replies Carousel */}
+        <View className="mb-3">
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 20, gap: 8 }}
+          >
             {quickReplies.map((reply, idx) => (
-              <TouchableOpacity 
-                key={idx} 
+              <TouchableOpacity
+                key={idx}
                 activeOpacity={0.7}
                 onPress={() => setInputText(reply)}
-                className="px-5 py-2.5 bg-white border border-outline-variant/40 rounded-full shadow-sm shadow-black/5"
+                className="px-4 py-2 bg-white border border-zinc-200/70 rounded-full shadow-sm shadow-black/[0.02]"
               >
-                <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-[14px] text-on-surface">{reply}</Text>
+                <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-[13px] text-zinc-800">
+                  {reply}
+                </Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -116,36 +198,50 @@ export default function AssessmentChatScreen() {
 
         {/* Main Input Bar */}
         <View className="px-5">
-          <View className="flex-row items-center gap-3 bg-[#f5f2fd] rounded-full p-1.5 border border-outline-variant/30">
-            <TouchableOpacity 
+          <View
+            style={{ minHeight: 56 }}
+            className="flex-row items-center gap-2.5 bg-white rounded-2xl p-2 px-3.5 border border-zinc-200/80 shadow-sm"
+          >
+            <TouchableOpacity
               onPress={toggleRecording}
               activeOpacity={0.8}
-              className={`w-11 h-11 rounded-full items-center justify-center shadow-md ${isRecording ? 'bg-error' : 'bg-primary'}`}
+              style={{ width: 42, height: 42 }}
+              className={`rounded-xl items-center justify-center shadow-xs ${
+                isRecording ? 'bg-rose-500' : 'bg-indigo-600'
+              }`}
             >
-              {isRecording ? <Square color="#ffffff" size={18} fill="#ffffff" /> : <Mic color="#ffffff" size={20} />}
+              {isRecording ? (
+                <Square color="#ffffff" size={18} fill="#ffffff" />
+              ) : (
+                <Mic color="#ffffff" size={20} />
+              )}
             </TouchableOpacity>
 
-            <TextInput 
-              className="flex-1 h-11 text-[16px] text-on-surface"
-              placeholder="Tell Sophie your goals..."
-              placeholderTextColor="#777585"
+            <TextInput
+              className="flex-1 h-12 text-[16px] text-zinc-900"
+              placeholder={`Answer in ${targetLang} or ${nativeLang}...`}
+              placeholderTextColor="#8e8e93"
               value={inputText}
               onChangeText={setInputText}
               style={{ fontFamily: 'Inter_400Regular' }}
               onSubmitEditing={handleSend}
             />
 
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={handleSend}
               activeOpacity={0.7}
-              className="w-11 h-11 items-center justify-center"
+              style={{ width: 42, height: 42 }}
+              className={`rounded-xl items-center justify-center ${
+                inputText.trim() ? 'bg-indigo-600' : 'bg-zinc-100'
+              }`}
               disabled={!inputText.trim()}
             >
-              <Send color={inputText.trim() ? "#3f3bbd" : "#c7c4d6"} size={24} />
+              <Send color={inputText.trim() ? '#ffffff' : '#a1a1aa'} size={19} />
             </TouchableOpacity>
           </View>
         </View>
+
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }

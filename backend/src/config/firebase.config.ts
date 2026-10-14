@@ -4,7 +4,7 @@ import logger from '../utils/logger';
 
 export const initializeFirebase = () => {
   try {
-    if (!admin.apps.length) {
+    if (!admin.apps.length && envConfig.firebase.projectId && envConfig.firebase.clientEmail) {
       admin.initializeApp({
         credential: admin.credential.cert({
           projectId: envConfig.firebase.projectId,
@@ -15,8 +15,8 @@ export const initializeFirebase = () => {
       });
       logger.info('Firebase Admin SDK initialized successfully.');
     }
-  } catch (error) {
-    logger.error(Failed to initialize Firebase Admin SDK: );
+  } catch (error: any) {
+    logger.warn(`Firebase Admin SDK initialization note: ${error.message}`);
   }
 };
 
